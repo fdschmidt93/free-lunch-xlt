@@ -1,0 +1,562 @@
+defaults:
+ # base trident datamodule configuration
+ - trident
+
+dataloader_cfg:
+  train:
+    batch_size: 4
+  val:
+    batch_size: 64
+  test:
+    batch_size: 64
+
+dataset_cfg:
+  _method_: # get methods of _target_ object
+    map: # dataset.map -> tokenization
+      # kwargs for dataset.map
+      function:
+        _partial_: true
+        _target_: src.tasks.text_classification.processor.preprocess_fn
+        column_names:
+          text: premise
+          text_pair: hypothesis
+    # unify output format of MNLI and XNLI
+    set_format:
+      columns:
+        - "input_ids"
+        - "attention_mask"
+        - "label"
+  train:
+    _datasets_:
+      en:
+        path: glue
+        name: mnli
+        split: train
+      aym:
+        path: americas_nli
+        name: aym
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 0
+                - ${shots}
+      bzd:
+        path: americas_nli
+        name: bzd
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 0
+                - ${shots}
+      gn:
+        path: americas_nli
+        name: gn
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 0
+                - ${shots}
+      quy:
+        path: americas_nli
+        name: quy
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 0
+                - ${shots}
+      tar:
+        path: americas_nli
+        name: tar
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 0
+                - ${shots}
+      shp:
+        path: americas_nli
+        name: shp
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 0
+                - ${shots}
+      hch:
+        path: americas_nli
+        name: hch
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 0
+                - ${shots}
+  val:
+    # Huggingface datasets syntax to concatenate these splits
+    _datasets_:
+      validation_anli_aym:
+        path: americas_nli
+        name: aym
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_aym:
+        path: americas_nli
+        name: aym
+        split: test
+      validation_anli_quy:
+        path: americas_nli
+        name: quy
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_quy:
+        path: americas_nli
+        name: quy
+        split: test
+      validation_anli_shp:
+        path: americas_nli
+        name: shp
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_shp:
+        path: americas_nli
+        name: shp
+        split: test
+      validation_anli_tar:
+        path: americas_nli
+        name: tar
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_tar:
+        path: americas_nli
+        name: tar
+        split: test
+      validation_anli_gn:
+        path: americas_nli
+        name: gn
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_gn:
+        path: americas_nli
+        name: gn
+        split: test
+      validation_anli_bzd:
+        path: americas_nli
+        name: bzd
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_bzd:
+        path: americas_nli
+        name: bzd
+        split: test
+      validation_anli_hch:
+        path: americas_nli
+        name: hch
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_hch:
+        path: americas_nli
+        name: hch
+        split: test
+      validation_xnli_en:
+        path: xnli
+        name: en
+        split: validation
+      test_xnli_en:
+        path: xnli
+        name: en
+        split: test
+      validation_anli_cni:
+        path: americas_nli
+        name: cni
+        split: validation
+      validation_anli_nah:
+        path: americas_nli
+        name: nah
+        split: validation
+      validation_anli_oto:
+        path: americas_nli
+        name: oto
+        split: validation
+      test_anli_cni:
+        path: americas_nli
+        name: cni
+        split: test
+      test_anli_nah:
+        path: americas_nli
+        name: nah
+        split: test
+      test_anli_oto:
+        path: americas_nli
+        name: oto
+        split: test
+      test_jampatois:
+        path: ${hydra:runtime.cwd}/jampatois_dataset.py
+        split: test
+      validation_indicxnli_as:
+        path: Divyanshu/indicxnli
+        name: as
+        split: validation
+      validation_indicxnli_bn:
+        path: Divyanshu/indicxnli
+        name: bn
+        split: validation
+      validation_indicxnli_gu:
+        path: Divyanshu/indicxnli
+        name: gu
+        split: validation
+      validation_indicxnli_hi:
+        path: Divyanshu/indicxnli
+        name: hi
+        split: validation
+      validation_indicxnli_kn:
+        path: Divyanshu/indicxnli
+        name: kn
+        split: validation
+      validation_indicxnli_ml:
+        path: Divyanshu/indicxnli
+        name: ml
+        split: validation
+      validation_indicxnli_mr:
+        path: Divyanshu/indicxnli
+        name: mr
+        split: validation
+      validation_indicxnli_or:
+        path: Divyanshu/indicxnli
+        name: or
+        split: validation
+      validation_indicxnli_pa:
+        path: Divyanshu/indicxnli
+        name: pa
+        split: validation
+      validation_indicxnli_ta:
+        path: Divyanshu/indicxnli
+        name: ta
+        split: validation
+      validation_indicxnli_te:
+        path: Divyanshu/indicxnli
+        name: te
+        split: validation
+      test_indicxnli_as:
+        path: Divyanshu/indicxnli
+        name: as
+        split: test
+      test_indicxnli_bn:
+        path: Divyanshu/indicxnli
+        name: bn
+        split: test
+      test_indicxnli_gu:
+        path: Divyanshu/indicxnli
+        name: gu
+        split: test
+      test_indicxnli_hi:
+        path: Divyanshu/indicxnli
+        name: hi
+        split: test
+      test_indicxnli_kn:
+        path: Divyanshu/indicxnli
+        name: kn
+        split: test
+      test_indicxnli_ml:
+        path: Divyanshu/indicxnli
+        name: ml
+        split: test
+      test_indicxnli_mr:
+        path: Divyanshu/indicxnli
+        name: mr
+        split: test
+      test_indicxnli_or:
+        path: Divyanshu/indicxnli
+        name: or
+        split: test
+      test_indicxnli_pa:
+        path: Divyanshu/indicxnli
+        name: pa
+        split: test
+      test_indicxnli_ta:
+        path: Divyanshu/indicxnli
+        name: ta
+        split: test
+      test_indicxnli_te:
+        path: Divyanshu/indicxnli
+        name: te
+        split: test
+
+
+  test:
+    # Huggingface datasets syntax to concatenate these splits
+    _datasets_:
+      validation_anli_aym:
+        path: americas_nli
+        name: aym
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_aym:
+        path: americas_nli
+        name: aym
+        split: test
+      validation_anli_quy:
+        path: americas_nli
+        name: quy
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_quy:
+        path: americas_nli
+        name: quy
+        split: test
+      validation_anli_shp:
+        path: americas_nli
+        name: shp
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_shp:
+        path: americas_nli
+        name: shp
+        split: test
+      validation_anli_tar:
+        path: americas_nli
+        name: tar
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_tar:
+        path: americas_nli
+        name: tar
+        split: test
+      validation_anli_gn:
+        path: americas_nli
+        name: gn
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_gn:
+        path: americas_nli
+        name: gn
+        split: test
+      validation_anli_bzd:
+        path: americas_nli
+        name: bzd
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_bzd:
+        path: americas_nli
+        name: bzd
+        split: test
+      validation_anli_hch:
+        path: americas_nli
+        name: hch
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_hch:
+        path: americas_nli
+        name: hch
+        split: test
+      validation_xnli_en:
+        path: xnli
+        name: en
+        split: validation
+      test_xnli_en:
+        path: xnli
+        name: en
+        split: test
+      test_anli_cni:
+        path: americas_nli
+        name: cni
+        split: test
+      test_anli_nah:
+        path: americas_nli
+        name: nah
+        split: test
+      test_anli_oto:
+        path: americas_nli
+        name: oto
+        split: test
+      test_jampatois:
+        path: ${hydra:runtime.cwd}/jampatois_dataset.py
+        split: test
+      test_indicxnli_as:
+        path: Divyanshu/indicxnli
+        name: as
+        split: test
+      test_indicxnli_bn:
+        path: Divyanshu/indicxnli
+        name: bn
+        split: test
+      test_indicxnli_gu:
+        path: Divyanshu/indicxnli
+        name: gu
+        split: test
+      test_indicxnli_hi:
+        path: Divyanshu/indicxnli
+        name: hi
+        split: test
+      test_indicxnli_kn:
+        path: Divyanshu/indicxnli
+        name: kn
+        split: test
+      test_indicxnli_ml:
+        path: Divyanshu/indicxnli
+        name: ml
+        split: test
+      test_indicxnli_mr:
+        path: Divyanshu/indicxnli
+        name: mr
+        split: test
+      test_indicxnli_or:
+        path: Divyanshu/indicxnli
+        name: or
+        split: test
+      test_indicxnli_pa:
+        path: Divyanshu/indicxnli
+        name: pa
+        split: test
+      test_indicxnli_ta:
+        path: Divyanshu/indicxnli
+        name: ta
+        split: test
+      test_indicxnli_te:
+        path: Divyanshu/indicxnli
+        name: te
+        split: test
+

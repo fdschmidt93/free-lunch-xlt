@@ -1,0 +1,39 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=wikiann_zs
+
+defaults:
+  - override /trainer: default.yaml # choose trainer from 'configs/trainer/'
+  - override /module: token_classification.yaml
+  - override /datamodule: wikiann_multi_avg.yaml
+  - override /callbacks: null
+  - override /config_callbacks: trident.yaml
+  - override /logger: wandb.yaml
+
+seed: 42
+shots: ???
+data_seed: ???
+test_after_training: false
+train: true
+
+module:
+  _target_: src.projects.fsxlt_avg.module.GradientVaccinationForTokenClassification
+  avg_ckpts: '${hydra:runtime.output_dir}/checkpoints/'
+  module_cfg:
+    weights_from_checkpoint:
+      # ckpt_path: "./logs/fsxlt/wikiann/zs/seed-42_lr-2e-05/checkpoints/9-6250.ckpt"
+      ckpt_path: "./logs/fsxlt/wikiann/zs_/seed-42_lr-2e-05/checkpoints/9-6250.ckpt"
+
+trainer:
+  max_epochs: 10
+  gpus: 1
+  num_sanity_val_steps: 0
+  deterministic: true
+  precision: 16
+  enable_checkpointing: false
+
+logger:
+  wandb:
+    project: "wikiann-multi-gv"
+    name: "shots=${shots}_seed=${seed}_dataseed=${data_seed}_lr=${module.optimizer.lr}_epochs=${trainer.max_epochs}"

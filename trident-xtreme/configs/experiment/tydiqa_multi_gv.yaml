@@ -1,0 +1,39 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=mnli
+
+defaults:
+  - override /trainer: default.yaml # choose trainer from 'configs/trainer/'
+  - override /module: question_answering.yaml
+  - override /datamodule: tydiqa_multi_avg.yaml
+  - override /callbacks: null
+  - override /config_callbacks: trident.yaml
+  - override /logger: wandb.yaml
+
+seed: 42
+shots: ???
+data_seed: ???
+test_after_training: false
+train: true
+
+trainer:
+  num_sanity_val_steps: 0
+  max_epochs: 10
+  gpus: 1
+  precision: 16
+  deterministic: true
+  enable_checkpointing: false
+
+module:
+  _target_: src.projects.fsxlt_avg.module.GradientVaccinationForQuestionAnswering
+  model:
+    pretrained_model_name_or_path: "xlm-roberta-base"
+  module_cfg:
+    weights_from_checkpoint:
+      ckpt_path: "./logs/fsxlt/tydiqa/zs/seed-42/lr-2e-05/checkpoints/9-1200.ckpt"
+
+logger:
+  wandb:
+    name: "shots=${shots}_seed=${seed}_dataseed=${data_seed}_lr=${module.optimizer.lr}_epochs=${trainer.max_epochs}"
+    project: "tydiqa-multi-gv"

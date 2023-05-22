@@ -1,0 +1,56 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=mnli
+
+defaults:
+  - override /trainer: default.yaml # choose trainer from 'configs/trainer/'
+  - override /module: text_classification.yaml
+  - override /datamodule: amnli_bi_avg.yaml
+  - override /callbacks: null
+  - override /config_callbacks: trident.yaml
+  - override /logger: wandb.yaml
+
+seed: 42
+shots: ???
+strategy: ???
+data_seed: ???
+lang: ???
+test_after_training: true
+train: true
+
+trainer:
+  max_epochs: 1
+  gpus: 1
+  precision: 16
+  num_sanity_val_steps: 0
+  enable_checkpointing: true
+  val_check_interval: 2454
+
+module:
+  _target_: src.projects.fsxlt_avg.module.MultiTaskSequenceClassification
+  avg_ckpts: '${hydra:runtime.output_dir}/checkpoints/'
+  model:
+    num_labels: 3
+    pretrained_model_name_or_path: "xlm-roberta-base"
+  module_cfg:
+    weights_from_checkpoint:
+      ckpt_path: "./logs/fsxlt/nli/zs/seed-42_lr-2e-05/checkpoints/9-122720.ckpt"
+
+logger:
+  wandb:
+    project: "amnli-bi-avg"
+    name: "lang=${lang}_strategy=${strategy}_shots=${shots}_seed=${seed}_dataseed=${data_seed}_lr=${module.optimizer.lr}_epochs=${trainer.max_epochs}"
+
+callbacks:
+  model_checkpoint_on_epoch:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    monitor: null # name of the logged metric which determines when model is improving
+    mode: "max" # can be "max" or "min"
+    every_n_train_steps: 2454 # twice per epoch
+    verbose: true
+    save_top_k: -1 # -1 -> all models are saved
+    save_last: false # additionaly always save model from last epoch
+    save_weights_only: true
+    dirpath: "${hydra:runtime.output_dir}/checkpoints/"
+    auto_insert_metric_name: false

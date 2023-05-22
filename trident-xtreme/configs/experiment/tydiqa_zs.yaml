@@ -1,0 +1,50 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=mnli
+
+defaults:
+  - override /trainer: default.yaml # choose trainer from 'configs/trainer/'
+  - override /module: question_answering.yaml
+  - override /datamodule: tydiqa_zs.yaml
+  - override /callbacks: null
+  - override /config_callbacks: trident.yaml
+  - override /logger: wandb.yaml
+
+trainer:
+  num_sanity_val_steps: 0
+  max_epochs: 10
+  gpus: 1
+  precision: 16
+  deterministic: true
+
+seed: 42
+clf_seed: 42
+train: true
+test_after_training: true
+strategy: "avgall"
+
+# trainer:
+#   num_sanity_val_steps: 0 # evaluation not yet supported
+
+module:
+  model:
+    pretrained_model_name_or_path: "xlm-roberta-base"
+
+logger:
+  wandb:
+    name: "seed=${seed}_lr=${module.optimizer.lr}_epochs=${trainer.max_epochs}"
+    # name: "clf-seed=${clf_seed}_seed=${seed}_lr=${module.optimizer.lr}_epochs=${trainer.max_epochs}"
+    project: "tydiqa-zs"
+
+callbacks:
+  model_checkpoint_on_epoch:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    monitor: null # name of the logged metric which determines when model is improving
+    every_n_epochs: 1 # truncated length of MNLI train / 16
+    verbose: false
+    save_top_k: -1 # -1 -> all models are saved
+    save_last: false # additionaly always save model from last epoch
+    dirpath: "${hydra:runtime.output_dir}/checkpoints/"
+    save_weights_only: true
+    auto_insert_metric_name: false

@@ -1,0 +1,502 @@
+# NER zero shot transfer to
+# Selected wikiann languages
+# MasakhaNER
+
+_target_: trident.TridentDataModule
+_recursive_: false
+
+datamodule_cfg:
+  remove_unused_columns: true
+  keep_raw_dataset: false
+  setup:
+    _target_: trident.utils.data.setup
+    _recursive_: false
+  on_after_setup:
+    _target_: src.tasks.token_classification.processor.on_after_setup
+    max_length: 510
+    tokenizer:
+      _target_: transformers.AutoTokenizer.from_pretrained
+      pretrained_model_name_or_path: ${module.model.pretrained_model_name_or_path}
+      add_prefix_space: true
+    column_names:
+      text: tokens
+      label: ner_tags
+
+dataloader_cfg:
+  _target_: torch.utils.data.dataloader.DataLoader
+  collate_fn:
+    _target_: transformers.data.data_collator.DataCollatorForTokenClassification
+    tokenizer:
+      _target_: transformers.AutoTokenizer.from_pretrained
+      pretrained_model_name_or_path: ${module.model.pretrained_model_name_or_path}
+    max_length: 510
+    padding: true
+  train:
+    batch_size: 32
+    shuffle: true
+  val:
+    batch_size: 256
+    shuffle: false
+  test:
+    batch_size: 256
+    shuffle: false
+
+dataset_cfg:
+  _target_: datasets.load.load_dataset
+  train:
+    path: wikiann
+    name: ${source_lang}
+    split: train
+  val:
+    # _datasets_:
+    #   validation_wikiann_en:
+    #     path: wikiann
+    #     name: en
+    #     split: validation
+    #   validation_wikiann_ar:
+    #     path: wikiann
+    #     name: ar
+    #     split: validation
+    #   test_wikiann_en:
+    #     path: wikiann
+    #     name: en
+    #     split: test
+    #   test_wikiann_ar:
+    #     path: wikiann
+    #     name: ar
+    #     split: test
+    _datasets_:
+      validation_wikiann_en:
+        path: wikiann
+        name: en
+        split: validation
+      validation_wikiann_ar:
+        path: wikiann
+        name: ar
+        split: validation
+      validation_wikiann_de:
+        path: wikiann
+        name: de
+        split: validation
+      validation_wikiann_ru:
+        path: wikiann
+        name: ru
+        split: validation
+      validation_wikiann_zh:
+        path: wikiann
+        name: zh
+        split: validation
+      validation_wikiann_ja:
+        path: wikiann
+        name: ja
+        split: validation
+      validation_wikiann_ur:
+        path: wikiann
+        name: ur
+        split: validation
+      validation_wikiann_ay:
+        path: wikiann
+        name: ay
+        split: validation
+      validation_wikiann_qu:
+        path: wikiann
+        name: qu
+        split: validation
+      validation_wikiann_ta:
+        path: wikiann
+        name: ta
+        split: validation
+      validation_wikiann_sw:
+        path: wikiann
+        name: sw
+        split: validation
+      validation_wikiann_yo:
+        path: wikiann
+        name: yo
+        split: validation
+      validation_wikiann_rw:
+        path: wikiann
+        name: rw
+        split: validation
+      validation_wikiann_am:
+        path: wikiann
+        name: am
+        split: validation
+      validation_wikiann_ig:
+        path: wikiann
+        name: ig
+        split: validation
+      validation_wikiann_hi:
+        path: wikiann
+        name: hi
+        split: validation
+      validation_wikiann_fr:
+        path: wikiann
+        name: fr
+        split: validation
+      validation_wikiann_es:
+        path: wikiann
+        name: es
+        split: validation
+      validation_wikiann_vi:
+        path: wikiann
+        name: vi
+        split: validation
+      validation_wikiann_tr:
+        path: wikiann
+        name: tr
+        split: validation
+      validation_wikiann_bg:
+        path: wikiann
+        name: bg
+        split: validation
+      validation_wikiann_te:
+        path: wikiann
+        name: te
+        split: validation
+      validation_wikiann_el:
+        path: wikiann
+        name: el
+        split: validation
+      validation_wikiann_he:
+        path: wikiann
+        name: he
+        split: validation
+      validation_masakhaner_amh:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: amh
+        split: validation
+      validation_masakhaner_hau:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: hau
+        split: validation
+      validation_masakhaner_ibo:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: ibo
+        split: validation
+      validation_masakhaner_kin:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: kin
+        split: validation
+      validation_masakhaner_lug:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: lug
+        split: validation
+      validation_masakhaner_luo:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: luo
+        split: validation
+      validation_masakhaner_pcm:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: pcm
+        split: validation
+      validation_masakhaner_swa:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: swa
+        split: validation
+      validation_masakhaner_wol:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: wol
+        split: validation
+      validation_masakhaner_yor:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: yor
+        split: validation
+      test_wikiann_en:
+        path: wikiann
+        name: en
+        split: test
+      test_wikiann_ar:
+        path: wikiann
+        name: ar
+        split: test
+      test_wikiann_de:
+        path: wikiann
+        name: de
+        split: test
+      test_wikiann_ru:
+        path: wikiann
+        name: ru
+        split: test
+      test_wikiann_zh:
+        path: wikiann
+        name: zh
+        split: test
+      test_wikiann_ja:
+        path: wikiann
+        name: ja
+        split: test
+      test_wikiann_ur:
+        path: wikiann
+        name: ur
+        split: test
+      test_wikiann_ay:
+        path: wikiann
+        name: ay
+        split: test
+      test_wikiann_qu:
+        path: wikiann
+        name: qu
+        split: test
+      test_wikiann_ta:
+        path: wikiann
+        name: ta
+        split: test
+      test_wikiann_sw:
+        path: wikiann
+        name: sw
+        split: test
+      test_wikiann_yo:
+        path: wikiann
+        name: yo
+        split: test
+      test_wikiann_rw:
+        path: wikiann
+        name: rw
+        split: test
+      test_wikiann_am:
+        path: wikiann
+        name: am
+        split: test
+      test_wikiann_ig:
+        path: wikiann
+        name: ig
+        split: test
+      test_wikiann_hi:
+        path: wikiann
+        name: hi
+        split: test
+      test_wikiann_fr:
+        path: wikiann
+        name: fr
+        split: test
+      test_wikiann_es:
+        path: wikiann
+        name: es
+        split: test
+      test_wikiann_vi:
+        path: wikiann
+        name: vi
+        split: test
+      test_wikiann_tr:
+        path: wikiann
+        name: tr
+        split: test
+      test_wikiann_bg:
+        path: wikiann
+        name: bg
+        split: test
+      test_wikiann_te:
+        path: wikiann
+        name: te
+        split: test
+      test_wikiann_el:
+        path: wikiann
+        name: el
+        split: test
+      test_wikiann_he:
+        path: wikiann
+        name: he
+        split: test
+      test_masakhaner_amh:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: amh
+        split: test
+      test_masakhaner_hau:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: hau
+        split: test
+      test_masakhaner_ibo:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: ibo
+        split: test
+      test_masakhaner_kin:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: kin
+        split: test
+      test_masakhaner_lug:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: lug
+        split: test
+      test_masakhaner_luo:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: luo
+        split: test
+      test_masakhaner_pcm:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: pcm
+        split: test
+      test_masakhaner_swa:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: swa
+        split: test
+      test_masakhaner_wol:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: wol
+        split: test
+      test_masakhaner_yor:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: yor
+        split: test
+      validation_wikiann_fi:
+        path: wikiann
+        name: fi
+        split: validation
+      test_wikiann_fi:
+        path: wikiann
+        name: fi
+        split: test
+      validation_wikiann_hu:
+        path: wikiann
+        name: hu
+        split: validation
+      test_wikiann_hu:
+        path: wikiann
+        name: hu
+        split: test
+  test: 
+    _datasets_:
+      test_wikiann_en:
+        path: wikiann
+        name: en
+        split: test
+      test_wikiann_ar:
+        path: wikiann
+        name: ar
+        split: test
+      test_wikiann_de:
+        path: wikiann
+        name: de
+        split: test
+      test_wikiann_fi:
+        path: wikiann
+        name: fi
+        split: test
+      test_wikiann_hu:
+        path: wikiann
+        name: hu
+        split: test
+      test_wikiann_ru:
+        path: wikiann
+        name: ru
+        split: test
+      test_wikiann_zh:
+        path: wikiann
+        name: zh
+        split: test
+      test_wikiann_ja:
+        path: wikiann
+        name: ja
+        split: test
+      test_wikiann_ur:
+        path: wikiann
+        name: ur
+        split: test
+      test_wikiann_ay:
+        path: wikiann
+        name: ay
+        split: test
+      test_wikiann_qu:
+        path: wikiann
+        name: qu
+        split: test
+      test_wikiann_ta:
+        path: wikiann
+        name: ta
+        split: test
+      test_wikiann_sw:
+        path: wikiann
+        name: sw
+        split: test
+      test_wikiann_yo:
+        path: wikiann
+        name: yo
+        split: test
+      test_wikiann_rw:
+        path: wikiann
+        name: rw
+        split: test
+      test_wikiann_am:
+        path: wikiann
+        name: am
+        split: test
+      test_wikiann_ig:
+        path: wikiann
+        name: ig
+        split: test
+      test_wikiann_hi:
+        path: wikiann
+        name: hi
+        split: test
+      test_wikiann_fr:
+        path: wikiann
+        name: fr
+        split: test
+      test_wikiann_es:
+        path: wikiann
+        name: es
+        split: test
+      test_wikiann_vi:
+        path: wikiann
+        name: vi
+        split: test
+      test_wikiann_tr:
+        path: wikiann
+        name: tr
+        split: test
+      test_wikiann_bg:
+        path: wikiann
+        name: bg
+        split: test
+      test_wikiann_te:
+        path: wikiann
+        name: te
+        split: test
+      test_wikiann_el:
+        path: wikiann
+        name: el
+        split: test
+      test_wikiann_he:
+        path: wikiann
+        name: he
+        split: test
+      test_masakhaner_amh:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: amh
+        split: test
+      test_masakhaner_hau:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: hau
+        split: test
+      test_masakhaner_ibo:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: ibo
+        split: test
+      test_masakhaner_kin:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: kin
+        split: test
+      test_masakhaner_lug:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: lug
+        split: test
+      test_masakhaner_luo:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: luo
+        split: test
+      test_masakhaner_pcm:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: pcm
+        split: test
+      test_masakhaner_swa:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: swa
+        split: test
+      test_masakhaner_wol:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: wol
+        split: test
+      test_masakhaner_yor:
+        _target_: src.tasks.token_classification.processor.load_maskhaner
+        name: yor
+        split: test

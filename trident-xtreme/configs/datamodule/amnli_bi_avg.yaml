@@ -1,0 +1,104 @@
+defaults:
+ # base trident datamodule configuration
+ - trident
+
+dataloader_cfg:
+  train:
+    batch_size: 16
+  val:
+    batch_size: 64
+  test:
+    batch_size: 64
+
+dataset_cfg:
+  _method_: # get methods of _target_ object
+    map: # dataset.map -> tokenization
+      # kwargs for dataset.map
+      function:
+        _partial_: true
+        _target_: src.tasks.text_classification.processor.preprocess_fn
+        column_names:
+          text: premise
+          text_pair: hypothesis
+    # unify output format of MNLI and XNLI
+    set_format:
+      columns:
+        - "input_ids"
+        - "attention_mask"
+        - "label"
+  train:
+    _datasets_:
+      train_mnli_en:
+        path: glue
+        name: mnli
+        split: train
+      train_amnli_lang:
+        path: americas_nli
+        name: ${lang}
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 0
+                - ${shots}
+  val:
+    # Huggingface datasets syntax to concatenate these splits
+    _datasets_:
+      validation_anli_lang:
+        path: americas_nli
+        name: ${lang}
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_lang:
+        path: americas_nli
+        name: ${lang}
+        split: test
+      validation_xnli_en:
+        path: xnli
+        name: en
+        split: validation
+      test_xnli_en:
+        path: xnli
+        name: en
+        split: test
+
+  test:
+    # Huggingface datasets syntax to concatenate these splits
+    _datasets_:
+      validation_anli_lang:
+        path: americas_nli
+        name: ${lang}
+        split: validation
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - 742
+      test_anli_lang:
+        path: americas_nli
+        name: ${lang}
+        split: test
+      validation_xnli_en:
+        path: xnli
+        name: en
+        split: validation
+      test_xnli_en:
+        path: xnli
+        name: en
+        split: test

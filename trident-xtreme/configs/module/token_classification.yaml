@@ -1,0 +1,17 @@
+_recursive_: false
+_target_: trident.TridentModule
+
+defaults:
+# interleaved with setup so instantiated later (recursive false)
+- trident
+- /evaluation: token_classification
+# - /evaluation: token_classification_svd
+# - /evaluation: token_classification_attn
+
+module_cfg:
+  setup:
+    _target_: src.tasks.token_classification.processor.module_setup
+    
+model:
+  _target_: transformers.AutoModelForTokenClassification.from_pretrained
+  pretrained_model_name_or_path: "xlm-roberta-base"

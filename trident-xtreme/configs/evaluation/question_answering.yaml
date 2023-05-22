@@ -1,0 +1,27 @@
+
+prepare_cfg:
+  # outputs:
+  #   _partial_: true
+  #   _target_: src.utils.hydra.get_logits
+
+  step_outputs:
+    _partial_: true
+    _target_: src.tasks.question_answering.processor.postprocess_qa_predictions
+
+step_outputs:
+  outputs: 
+    - "start_logits"
+    - "end_logits"
+
+metrics_cfg:
+    hf:
+      metric: 
+        _partial_: true
+        _target_: datasets.metric.Metric.compute
+        self:
+          _target_: datasets.load_metric
+          path: "squad"
+      compute_on: "epoch_end"
+      kwargs:
+        predictions: "outputs:predictions"
+        references: "outputs:label_ids"

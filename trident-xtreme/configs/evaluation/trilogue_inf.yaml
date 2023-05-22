@@ -1,0 +1,21 @@
+prepare_cfg:
+  batch: null  # takes (module: TridentModule, batch: dict, stage: star)
+  outputs:     # takes (module: TridentModule, outputs: dict, batch: dict, stage: str)                             
+    _partial_: true
+    _target_: src.tasks.text_classification.eval.get_preds
+    # takes (module: TridentModule, flattened_step_outputs: dict, stage: str)
+    # where list of step_outputs are flattened
+  step_outputs: 
+    _partial_: true
+    _target_: src.projects.trilogue.utils.save_preds
+
+# Which keys/attributes are supposed to be collected from `outputs` and `batch`
+step_outputs:
+  outputs:
+    - "preds" # can be a str
+    - "logits" # can be a str
+
+# either metrics or val_metrics and test_metrics
+# where the latter
+# metrics_cfg should be copied for each dataset by default unless _datasets_ is specified
+metrics_cfg: null

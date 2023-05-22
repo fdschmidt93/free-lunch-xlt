@@ -1,0 +1,8 @@
+defaults:
+  - trident
+  # - /evaluation: tatoeba
+  - /evaluation: wikiann_tatoeba
+
+model:
+  _target_: transformers.AutoModel.from_pretrained
+  pretrained_model_name_or_path: ???

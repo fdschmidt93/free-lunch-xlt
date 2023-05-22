@@ -1,0 +1,49 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=wikiann_zs
+
+defaults:
+  - override /trainer: default.yaml # choose trainer from 'configs/trainer/'
+  - override /module: token_classification.yaml
+  - override /datamodule: wikiann_zs.yaml
+  - override /callbacks: null
+  - override /config_callbacks: trident.yaml
+  - override /logger: wandb.yaml
+
+seed: 42
+source_lang: en
+test_after_training: true
+train: true
+clf_seed: 42
+strategy: "avgall"
+
+trainer:
+  max_epochs: 10
+  gpus: 1
+  num_sanity_val_steps: 0
+  deterministic: true
+  precision: 16
+
+logger:
+  wandb:
+    project: "wikiann-zs"
+    # name: "seed=${seed}_lr=${module.optimizer.lr}_epochs=${trainer.max_epochs}"
+    name: "strategy=${strategy}_seed=${seed}_lr=${module.optimizer.lr}_epochs=${trainer.max_epochs}"
+    # name: "strategy=${strategy}_clf-seed=${clf_seed}_seed=${seed}_lr=${module.optimizer.lr}_epochs=${trainer.max_epochs}"
+
+callbacks:
+  model_checkpoint_on_epoch:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    monitor: null # name of the logged metric which determines when model is improving
+    mode: "max" # can be "max" or "min"
+    every_n_epochs: 1 # truncated length of MNLI train / 16
+    verbose: true
+    save_top_k: -1 # -1 -> all models are saved
+    save_last: false # additionaly always save model from last epoch
+    dirpath: "${hydra:runtime.output_dir}/checkpoints/"
+    auto_insert_metric_name: false
+    save_weights_only: true
+  learning_rate:
+    _target_: pytorch_lightning.callbacks.LearningRateMonitor
+    logging_interval: "step"

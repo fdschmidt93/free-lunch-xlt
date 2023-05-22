@@ -1,0 +1,149 @@
+prepare_cfg:
+  batch: # takes (module: TridentModule, batch: dict, stage: star)
+    _partial_: true
+    _target_: src.tasks.retrieval.utils.set_batch_attribute
+    attribute: output_attentions
+  outputs: # takes (module: TridentModule, outputs: dict, batch: dict, stage: str)                             
+    _partial_: true
+    _target_: src.projects.robust.utils.eval_attention
+  step_outputs: null 
+
+# Which keys/attributes are supposed to be collected from `outputs` and `batch`
+step_outputs:
+  outputs:
+    # - "score" # can be a str
+    - score_0
+    - score_1
+    - score_2
+    - score_3
+    - score_4
+    - score_5
+    - score_6
+    - score_7
+    - score_8
+    - score_9
+    - score_10
+    - score_11
+
+# either metrics or val_metrics and test_metrics
+# where the latter
+# metrics_cfg should be copied for each dataset by default unless _datasets_ is specified
+metrics_cfg:
+  # name of the metric used eg for logging
+  # entropy:
+  #   # instructions to instantiate metric, preferrably torchmetrics.Metric
+  #   metric:
+  #     _partial_: true
+  #     _target_: torch.mean
+  #   # either "eval_step" or "epoch_end"
+  #   compute_on: "epoch_end"
+  #   kwargs: 
+  #     input: "outputs:score"
+  score_0:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_0"
+  score_1:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_1"
+  score_2:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_2"
+  score_3:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_3"
+  score_4:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_4"
+  score_5:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_5"
+  score_6:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_6"
+  score_7:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_7"
+  score_8:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_8"
+  score_9:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_9"
+  score_10:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_10"
+  score_11:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torch.mean
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs:
+      input: "outputs:score_11"

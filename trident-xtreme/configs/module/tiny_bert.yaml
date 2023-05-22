@@ -1,0 +1,8 @@
+defaults:
+- /evaluation: classification
+
+model:
+  _target_: transformers.AutoModelForSequenceClassification.from_pretrained
+  num_labels: 3
+  # _target_: transformers.AutoModel.from_pretrained
+  pretrained_model_name_or_path: "prajjwal1/bert-tiny"

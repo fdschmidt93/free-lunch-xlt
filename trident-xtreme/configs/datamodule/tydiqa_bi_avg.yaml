@@ -1,0 +1,110 @@
+defaults:
+ # base trident datamodule configuration
+  - trident
+
+datamodule_cfg:
+  remove_unused_columns: true
+  keep_raw_dataset: true
+
+dataloader_cfg:
+  train:
+    batch_size: 16
+
+dataset_cfg:
+  path: ${hydra:runtime.cwd}/tydiqa_goldp_dataset.py
+  _method_:
+    map:
+      batched: true
+      function:
+        _target_: src.tasks.question_answering.processor.preprocess_fn_val_test
+        _partial_: true
+        tokenizer:
+          # "When splitting up a long document into chunks, how much stride to take between chunks."
+          stride: 128
+          padding: "max_length"
+          max_length: 384
+          return_overflowing_tokens: true  # do not change
+          return_offsets_mapping: true  # do not change
+        column_names:
+          context: context
+          question: question
+          answers: answers
+      remove_columns:
+        - "id"
+        - "context"
+        - "question"
+        - "answers"
+
+  # train dataset instances ('ar', 14805)   
+  # train dataset instances ('bn', 2390)
+  # train dataset instances ('en', 3696)
+  # train dataset instances ('fi', 6855)
+  # train dataset instances ('id', 5702)
+  # train dataset instances ('ko', 1625)
+  # train dataset instances ('ru', 6490)
+  # train dataset instances ('sw', 2755)
+  # train dataset instances ('te', 5563)
+  train:
+    _datasets_:
+      train_tydiqa_en:
+        _method_:
+          map:
+            function:
+              _target_: src.tasks.question_answering.processor.preprocess_fn_train
+        name: en
+        split: train
+      train_tydiqa_lang:
+        name: ${lang}
+        split: train
+        _method_:
+          map:
+            function:
+              _target_: src.tasks.question_answering.processor.preprocess_fn_train
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 0
+                - ${shots}
+  val:
+    _datasets_:
+      test_tydiqa_en:
+        name: en
+        split: dev
+      validation_tydiqa_lang:
+        name: ${lang}
+        split: train
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - ${lang_val_len}
+      test_tydiqa_lang:
+        name: ${lang}
+        split: dev
+  test: 
+    _datasets_:
+      test_tydiqa_en:
+        name: en
+        split: dev
+      validation_tydiqa_lang:
+        name: ${lang}
+        split: train
+        _method_:
+          shuffle:
+            seed: ${data_seed}
+          select:
+            indices:
+              _target_: builtins.range
+              _args_:
+                - 500
+                - ${lang_val_len}
+      test_tydiqa_lang:
+        name: ${lang}
+        split: dev

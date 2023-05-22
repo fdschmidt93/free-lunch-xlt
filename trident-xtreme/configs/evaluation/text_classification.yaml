@@ -1,0 +1,187 @@
+prepare_cfg:
+  batch: null  # takes (module: TridentModule, batch: dict, stage: star)
+  outputs:     # takes (module: TridentModule, outputs: dict, batch: dict, stage: str)                             
+    _partial_: true
+    _target_: src.tasks.text_classification.eval.get_preds
+    # takes (module: TridentModule, flattened_step_outputs: dict, stage: str)
+    # where list of step_outputs are flattened
+  step_outputs: null 
+
+# Which keys/attributes are supposed to be collected from `outputs` and `batch`
+step_outputs:
+  outputs:
+    - "preds" # can be a str
+    - "logits"
+  batch: # or a list[str]
+    - labels
+
+# either metrics or val_metrics and test_metrics
+# where the latter
+# metrics_cfg should be copied for each dataset by default unless _datasets_ is specified
+metrics_cfg:
+  # name of the metric used eg for logging
+  acc:
+    # instructions to instantiate metric, preferrably torchmetrics.Metric
+    metric:
+      _partial_: true
+      _target_: torchmetrics.functional.accuracy
+    # either "eval_step" or "epoch_end"
+    compute_on: "epoch_end"
+    kwargs: 
+      preds: "outputs:preds"
+      target: "outputs:labels"
+
+  # _datasets_:
+  #   clean:
+  #     # name of the metric used eg for logging
+  #     acc:
+  #       # instructions to instantiate metric, preferrably torchmetrics.Metric
+  #       metric:
+  #         _partial_: true
+  #         _target_: torchmetrics.functional.accuracy
+  #       # either "eval_step" or "epoch_end"
+  #       compute_on: "epoch_end"
+  #       kwargs: 
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     micro_f1: metric:
+  #         _partial_: true
+  #         _target_: torchmetrics.functional.f1_score
+  #         average: 'micro'
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     macro_f1:
+  #       metric:
+  #         _partial_: true
+  #         _target_: torchmetrics.functional.f1_score
+  #         average: 'macro'
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     weighted_f1:
+  #       metric:
+  #         _partial_: true
+  #         _target_: torchmetrics.functional.f1_score
+  #         average: 'weighted'
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     accuracy:
+  #       metric:
+  #         _partial_: true
+  #         _target_: src.projects.trilogue.utils.evaluate
+  #         metric: accuracy
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     precision:
+  #       metric:
+  #         _partial_: true
+  #         _target_: src.projects.trilogue.utils.evaluate
+  #         metric: precision
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     recall:
+  #       metric:
+  #         _partial_: true
+  #         _target_: src.projects.trilogue.utils.evaluate
+  #         metric: recall
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #   dirty:
+  #     # name of the metric used eg for logging
+  #     acc:
+  #       # instructions to instantiate metric, preferrably torchmetrics.Metric
+  #       metric:
+  #         _partial_: true
+  #         _target_: torchmetrics.functional.accuracy
+  #       # either "eval_step" or "epoch_end"
+  #       compute_on: "epoch_end"
+  #       kwargs: 
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     micro_f1:
+  #       metric:
+  #         _partial_: true
+  #         _target_: torchmetrics.functional.f1_score
+  #         average: 'micro'
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     macro_f1:
+  #       metric:
+  #         _partial_: true
+  #         _target_: torchmetrics.functional.f1_score
+  #         average: 'macro'
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     weighted_f1:
+  #       metric:
+  #         _partial_: true
+  #         _target_: torchmetrics.functional.f1_score
+  #         average: 'weighted'
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     accuracy:
+  #       metric:
+  #         _partial_: true
+  #         _target_: src.projects.trilogue.utils.evaluate
+  #         metric: accuracy
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     precision:
+  #       metric:
+  #         _partial_: true
+  #         _target_: src.projects.trilogue.utils.evaluate
+  #         metric: precision
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #     recall:
+  #       metric:
+  #         _partial_: true
+  #         _target_: src.projects.trilogue.utils.evaluate
+  #         metric: recall
+  #         num_classes: ${module.model.num_labels}
+  #       compute_on: "epoch_end"
+  #       kwargs:
+  #         preds: "outputs:preds"
+  #         target: "outputs:labels"
+  #   clean_dirty:
+  #     alignment:
+  #       # instructions to instantiate metric, preferrably torchmetrics.Metric
+  #       metric:
+  #         _partial_: true
+  #         _target_: src.projects.trilogue.utils.alignment
+  #       # either "eval_step" or "epoch_end"
+  #       compute_on: "epoch_end"
+  #       kwargs: 
+  #         preds: "outputs:preds"

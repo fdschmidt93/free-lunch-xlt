@@ -1,0 +1,56 @@
+defaults:
+ # base trident datamodule configuration
+ - trident
+
+dataset_cfg:
+  _method_: # get methods of _target_ object
+    map: # dataset.map -> tokenization
+      # kwargs for dataset.map
+      function:
+        _partial_: true
+        _target_: src.tasks.text_classification.processor.preprocess_fn
+        column_names:
+          text: premise
+          text_pair: hypothesis
+    # unify output format of MNLI and XNLI
+    set_format:
+      columns:
+        - "input_ids"
+        - "attention_mask"
+        - "label"
+
+  path: glue
+  name: mnli
+
+  train:
+    split: train
+
+  val:
+    # Huggingface datasets syntax to concatenate these splits
+    _datasets_:
+      xnli_en:
+        path: xnli
+        name: en
+        split: validation
+      xnli_de:
+        path: xnli
+        name: de
+        split: validation
+      xnli_fr:
+        path: xnli
+        name: fr
+        split: validation
+  test:
+    _datasets_:
+      xnli_en:
+        path: xnli
+        name: en
+        split: test
+      xnli_de:
+        path: xnli
+        name: de
+        split: test
+      xnli_fr:
+        path: xnli
+        name: fr
+        split: test

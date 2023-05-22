@@ -1,0 +1,99 @@
+# NER zero shot transfer to
+# Selected wikiann languages
+# MasakhaNER
+
+_target_: trident.TridentDataModule
+_recursive_: false
+
+datamodule_cfg:
+  remove_unused_columns: true
+  keep_raw_dataset: false
+  setup:
+    _target_: trident.utils.data.setup
+    _recursive_: false
+  on_after_setup:
+    _target_: src.tasks.token_classification.processor.on_after_setup
+    max_length: 510
+    tokenizer:
+      _target_: transformers.AutoTokenizer.from_pretrained
+      pretrained_model_name_or_path: ${module.model.pretrained_model_name_or_path}
+    column_names:
+      text: tokens
+      label: pos_tags
+
+dataloader_cfg:
+  _target_: torch.utils.data.dataloader.DataLoader
+  collate_fn:
+    _target_: transformers.data.data_collator.DataCollatorForTokenClassification
+    tokenizer:
+      _target_: transformers.AutoTokenizer.from_pretrained
+      pretrained_model_name_or_path: ${module.model.pretrained_model_name_or_path}
+    max_length: 510
+    padding: true
+  train:
+    batch_size: 16
+    shuffle: true
+  val:
+    batch_size: 256
+    shuffle: false
+  test:
+    batch_size: 256
+    shuffle: false
+
+dataset_cfg:
+  _target_: datasets.load.load_dataset
+  train:
+    _datasets_:
+      train_udpos_English:
+          path: xtreme
+          name: udpos.English
+          split: train
+      train_udpos_lang:
+          _method_:
+            shuffle:
+              seed: ${data_seed}
+            select:
+              indices:
+                _target_: builtins.range
+                _args_:
+                  - 0
+                  - ${shots}
+          path: xtreme
+          name: udpos.${lang}
+          split: train
+  val:
+    _datasets_:
+      validation_udpos_English:
+        path: xtreme
+        name: udpos.English
+        split: validation
+      validation_udpos_lang:
+        path: xtreme
+        name: udpos.${lang}
+        split: validation
+      test_udpos_English:
+        path: xtreme
+        name: udpos.English
+        split: test
+      test_udpos_lang:
+        path: xtreme
+        name: udpos.${lang}
+        split: test
+  test:
+    _datasets_:
+      validation_udpos_English:
+        path: xtreme
+        name: udpos.English
+        split: validation
+      validation_udpos_lang:
+        path: xtreme
+        name: udpos.${lang}
+        split: validation
+      test_udpos_English:
+        path: xtreme
+        name: udpos.English
+        split: test
+      test_udpos_lang:
+        path: xtreme
+        name: udpos.${lang}
+        split: test
