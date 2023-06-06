@@ -12,3 +12,7 @@ Then switch to `trident-xtreme` and
 
 1. `conda activate trident_xtreme`
 2. `bash $YOUR_EXPERIMENT.sh`
+
+# Disclaimer
+
+This repository is very much in a working state at time of submission. I plan on cleaning it up in the week from 25th of June 2023. Should you have any questions beforehand, please feel free to raise an issue or contact me at fabian.schmidt@uni-wuerzburg.de.
